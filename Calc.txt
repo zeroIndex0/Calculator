@@ -1,5 +1,5 @@
 ## Title:  Calc
-## Version 3.3.2
+## Version 3.3.3
 ## Purpose:  A simple chat box calculator now with UI
 ## APIVersion:  100023
 ## Author: zeroIndex
