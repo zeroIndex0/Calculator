@@ -111,7 +111,7 @@ local function CreateSettingsWindow()
 		name = "Calculator",
 		displayName = "|cAADDBBCalculator|r",
 		author = "zeroIndex",
-		version = "3.3.2",             ---update verison here due to it wiping Calc.SV with each update
+		version = "3.3.3",             ---update verison here due to it wiping Calc.SV with each update
 		slashCommand = "/calcsettings",
 		registerForRefresh = true,
 		registerForDefaults = false,
