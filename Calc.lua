@@ -1,3 +1,4 @@
+TODO: Update versions below to prep for new api release
 -- There is now a UI for the calculator and some options to change the colors
 -- There is an option to set a keybinding for quick pop up and down of the calculator
 -- you can also use /calc open and /calc close
