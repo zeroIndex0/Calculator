@@ -10,4 +10,4 @@ Here is a link to where you can download the addon and look at some pictures of 
 
 http://www.esoui.com/downloads/info697-Calculator.html
 
---Will need to update versions in two different files and update api version number
+--Will need to update versions in txt file and update the api version number
