@@ -16,7 +16,7 @@ local LAM2 = LibStub("LibAddonMenu-2.0")
 
 
 Calc.name = "Calc"
-Calc.version = 3  --edit this and reset all SV  version 3.3.2
+Calc.version = 3  --edit this and reset all SV  version 3.3.4
 Calc.buttons = {}
 Calc.default = {
     
@@ -111,7 +111,7 @@ local function CreateSettingsWindow()
 		name = "Calculator",
 		displayName = "|cAADDBBCalculator|r",
 		author = "zeroIndex",
-		version = "3.3.3",             ---update verison here due to it wiping Calc.SV with each update
+		version = "3.3.4",             ---update verison here due to it wiping Calc.SV with each update
 		slashCommand = "/calcsettings",
 		registerForRefresh = true,
 		registerForDefaults = false,
