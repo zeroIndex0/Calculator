@@ -1,7 +1,7 @@
 ## Title: Calc
-## Version 3.3.4
+## Version 3.3.5
 ## Purpose:  A simple chat box calculator now with UI
-## APIVersion:  100024
+## APIVersion:  100025
 ## Author: zeroIndex
 ## OptionalDependsOn: LibStub LibAddonMenu-2.0
 ## SavedVariables: Calc_SV
