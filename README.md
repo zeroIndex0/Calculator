@@ -1,6 +1,7 @@
 # Calculator
 A calculator addon for the Elder Scrolls Online
 
+###### Compatible with Murkmire DLC
 
 Its used in the chat box and also has a clickable UI.
 
