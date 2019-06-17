@@ -16,7 +16,7 @@ local LAM2 = LibStub("LibAddonMenu-2.0")
 
 
 Calc.name = "Calc"
-Calc.version = 3  --edit this and reset all SV  version 3.3.5
+Calc.version = 3  --edit this and reset all SV  version 3.3.6
 Calc.buttons = {}
 Calc.default = {
     
@@ -111,7 +111,7 @@ local function CreateSettingsWindow()
 		name = "Calculator",
 		displayName = "|cAADDBBCalculator|r",
 		author = "zeroIndex",
-		version = "3.3.5",             ---update verison here due to it wiping Calc.SV with each update
+		version = "3.3.6",             ---update verison here due to it wiping Calc.SV with each update
 		slashCommand = "/calcsettings",
 		registerForRefresh = true,
 		registerForDefaults = false,
@@ -387,25 +387,31 @@ end
 function Calc.CalcOnEqualsButtonClick(self, button)
     CalcInputString = CalcGetSolution()
     if CalcError == false then
-        if string.find(CalcInputString, "%.") then
-            CalcUpdateUiText(string.format("%.02f", CalcInputString))
-        else
-            CalcUpdateUiText(CalcInputString)
-        end
-        if CalcInputString ~= nil then
-            if Calc.SV.CalcChatMessage and not Calc.SV.CalcAllChatTabs then
-                CHAT_SYSTEM:Maximize()
-                if string.find(CalcInputString, "%.") then
-                    d("Answer: " .. string.format("%.02f", CalcInputString))
-                    CalcUpdateUiText(string.format("%.02f", CalcInputString))
-                else
-                    d("Answer: " .. CalcInputString)
-                    --Is there any difference here?
-                    --CHAT_SYSTEM:AddMessage("Answer: " .. CalcInputString)
+        -- FIxed issue where hitting '=' with no input was throwing an error
+        if CalcInputString then
+            if string.find(CalcInputString, "%.") then
+                CalcUpdateUiText(string.format("%.02f", CalcInputString))
+            else
+                CalcUpdateUiText(CalcInputString)
+            end
+            if CalcInputString ~= nil then
+                if Calc.SV.CalcChatMessage and not Calc.SV.CalcAllChatTabs then
+                    CHAT_SYSTEM:Maximize()
+                    if string.find(CalcInputString, "%.") then
+                        Calc.SV.answer = CalcInputString;
+                        d("Answer: " .. string.format("%.02f", CalcInputString))
+                        CalcUpdateUiText(string.format("%.02f", CalcInputString))
+                    else
+                        Calc.SV.answer = CalcInputString;
+                        d("Answer: " .. CalcInputString)
+                        --Is there any difference here?
+                        --CHAT_SYSTEM:AddMessage("Answer: " .. CalcInputString)
+                    end
+                elseif Calc.SV.CalcAllChatTabs and Calc.SV.CalcChatMessage then
+                    CHAT_SYSTEM:Maximize()
+                    Calc.SV.answer = CalcInputString;
+                    CalcAnswerToAllTabs(CalcInputString)
                 end
-            elseif Calc.SV.CalcAllChatTabs and Calc.SV.CalcChatMessage then
-                CHAT_SYSTEM:Maximize()
-                CalcAnswerToAllTabs(CalcInputString)
             end
         end
     end
@@ -442,8 +448,26 @@ end
 --lexer function for the slash command
 local CalcCheckText = false
 local function lexer(text)
+    -- Fixed catch error.  Thanks Phuein for catching that :)
+    -- Link to Phuein's addon page https://www.esoui.com/downloads/author-38690.html
+    if not text then
+        text = ''
+    end
+
+    if text == '' then
+        -- Toggle.
+        Calc.CalcToggleView()
+        -- NOTE Never reaches the empty case below.
+        return
+    end
 
     local text = string.lower(text)
+
+    -- If there is an answer saved, replace the string with what is saved in Calc.SV.answer
+    if Calc.SV.answer then
+        text = string.gsub(text, "answer", tostring(Calc.SV.answer))
+        text = string.gsub(text, "ans", tostring(Calc.SV.answer))
+    end
 
     if text == "open" then
         CalcUI:SetHidden(not Calc.SV.Show)
@@ -459,12 +483,15 @@ local function lexer(text)
             d("Error, you entered something wrong")
         else
             if Calc.SV.CalcAllChatTabs then
+                Calc.SV.answer = answer
                 CalcAnswerToAllTabs(answer)
             else
                 if string.find(answer, "%.") then
                     d("Answer: " .. string.format("%.02f", answer))
+                    Calc.SV.answer = answer
                 else
                     d("Answer: " .. answer)
+                    Calc.SV.answer = answer
                 end
             end
         end
