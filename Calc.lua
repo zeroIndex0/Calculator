@@ -1,13 +1,3 @@
--- There is now a UI for the calculator and some options to change the colors
--- There is an option to set a keybinding for quick pop up and down of the calculator
--- you can also use /calc open and /calc close
-
--- a simple calculator for use with the chat box,  by zeroIndex
--- and a big thanks to instant, ins@ESOUI for making the addonTests
--- and a huge thanks to Circonian's awesome addon tutorials @esoui/wiki
--- and a HUGE thanks to coolmodi for pointing out how much ive been overthinking this
--- which helped out a lot.
-
 
 Calc = Calc or {}
 
@@ -16,7 +6,7 @@ local LAM2 = LibStub("LibAddonMenu-2.0")
 
 
 Calc.name = "Calc"
-Calc.version = 3  --edit this and reset all SV  version 3.3.6
+Calc.version = 3  --edit this and reset all SV - meaning, don't do it! - version 3.3.7
 Calc.buttons = {}
 Calc.default = {
     
@@ -81,14 +71,25 @@ local function CalcGetSolution()
 end
 
 
-
+--sending to all tabs is outdated for API: 10030
+--the logic still works, so im leaving this in, incase they revert changes to d() in the future
 local function CalcAnswerToAllTabs(input)
     if CHAT_SYSTEM then
         if CHAT_SYSTEM.primaryContainer then
-            if string.find(input, "%.") then
-                CHAT_SYSTEM.primaryContainer:OnChatEvent(nil, "Answer: " .. string.format("%.02f", input), CHAT_CATEGORY_SYSTEM)
+            --If the old chat system is implemented, then use the old system.  Pre API: 100030
+            if CHAT_SYSTEM.primaryContainer.OnChatEvent then
+                if string.find(input, "%.") then
+                    CHAT_SYSTEM.primaryContainer:OnChatEvent(nil, "Answer: " .. string.format("%.02f", input), CHAT_CATEGORY_SYSTEM)
+                else
+                    CHAT_SYSTEM.primaryContainer:OnChatEvent(nil, "Answer: " .. input, CHAT_CATEGORY_SYSTEM)
+                end
             else
-                CHAT_SYSTEM.primaryContainer:OnChatEvent(nil, "Answer: " .. input, CHAT_CATEGORY_SYSTEM)
+            --Otherwise, use the new way of outputting yellow text.  After API: 100030
+                if string.find(input, "%.") then
+                    CHAT_SYSTEM.primaryContainer:AddEventMessageToContainer( "Answer: " .. string.format("%.02f", input), CHAT_CATEGORY_SYSTEM)
+                else
+                    CHAT_SYSTEM.primaryContainer:AddEventMessageToContainer( "Answer: " .. input, CHAT_CATEGORY_SYSTEM)
+                end
             end
         end
     end
@@ -111,7 +112,7 @@ local function CreateSettingsWindow()
 		name = "Calculator",
 		displayName = "|cAADDBBCalculator|r",
 		author = "zeroIndex",
-		version = "3.3.6",             ---update verison here due to it wiping Calc.SV with each update
+		version = "3.3.7",             ---update verison here due to it wiping Calc.SV with each update
 		slashCommand = "/calcsettings",
 		registerForRefresh = true,
 		registerForDefaults = false,
@@ -200,14 +201,17 @@ local function CreateSettingsWindow()
                 Calc.SV.CalcChatMessage = not Calc.SV.CalcChatMessage
             end,
         },
-        [5] = {
-            type = "checkbox",
-            name = "Send Answers to all Chat Tabs",
-            getFunc = function() return Calc.SV.CalcAllChatTabs end,
-            setFunc = function() 
-                Calc.SV.CalcAllChatTabs = not Calc.SV.CalcAllChatTabs
-            end,
-        },
+        -- This can be uncommented if they revert their changes to the way d() works
+        -- Currently, d() sends the message to all tabs, which used to not be the case when this was created
+        -- Calc.SV.CalcAllChatTabs can remain true without affecting the addon
+        -- [5] = {
+        --     type = "checkbox",
+        --     name = "Send Answers to all Chat Tabs",
+        --     getFunc = function() return Calc.SV.CalcAllChatTabs end,
+        --     setFunc = function() 
+        --         Calc.SV.CalcAllChatTabs = not Calc.SV.CalcAllChatTabs
+        --     end,
+        -- },
     }
     
     LAM2:RegisterOptionControls("CalculatorPanel", optionsData)
@@ -388,6 +392,7 @@ function Calc.CalcOnEqualsButtonClick(self, button)
     CalcInputString = CalcGetSolution()
     if CalcError == false then
         -- FIxed issue where hitting '=' with no input was throwing an error
+        -- By checking if CalcInputString has a value
         if CalcInputString then
             if string.find(CalcInputString, "%.") then
                 CalcUpdateUiText(string.format("%.02f", CalcInputString))
@@ -482,6 +487,8 @@ local function lexer(text)
         if answer == "" then
             d("Error, you entered something wrong")
         else
+            --sending to all tabs is outdated for API: 10030
+            --the logic still works, so im leaving this in, incase they revert changes to d() in the future
             if Calc.SV.CalcAllChatTabs then
                 Calc.SV.answer = answer
                 CalcAnswerToAllTabs(answer)
